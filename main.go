@@ -1,4 +1,4 @@
-package deviateDns
+package deviate_dns
 
 import (
 	"errors"
