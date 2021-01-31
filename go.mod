@@ -1,4 +1,4 @@
-module deviateDns
+module github.com/rlweb/deviate-dns
 
 go 1.15
 
