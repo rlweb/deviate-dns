@@ -1,0 +1,39 @@
+{
+  "apps": {
+    "tls": {
+      "automation": {
+        "on_demand": {
+          "rate_limit": {
+            "interval": "1m",
+            "burst": 10
+          }
+        },
+        "policies":[{
+          "issuers": [{
+            "module": "zerossl",
+            "email": "{env.EMAIL}",
+            "api_key": "{env.API_KEY}"
+          }]
+        }]
+      }
+    },
+    "http": {
+      "servers": {
+        "*": {
+          "listen": [":80", ":443"],
+          "routes": [
+            {
+              "handle": [
+                {"handler": "deviate-dns"},
+                {
+                  "handler": "static_response",
+                  "body": "The domain is pointing to Deviate DNS, check headers if your here by mistake"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}
