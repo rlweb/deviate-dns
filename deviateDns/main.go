@@ -14,6 +14,7 @@ import (
 const RedirectTitle = "Deviate DNS"
 const TxtRecordPrefix = "v=deviate-dns1 "
 const TxtRecordKeyGoto = "goto"
+const TxtRecordKeyEmail = "email"
 const TxtRecordKeyKeepPath = "keeppath"
 const TxtRecordKeyStatusCode = "statuscode"
 
@@ -71,6 +72,7 @@ var (
 
 type TxtRecord struct {
 	Goto string
+	Email string
 	StatusCode int
 	KeepPath bool
 }
@@ -103,6 +105,8 @@ func parseRecord(record string) (*TxtRecord, error) {
 		switch parts[0] {
 		case TxtRecordKeyGoto:
 			d.Goto = parts[1]
+		case TxtRecordKeyEmail:
+			d.Email = parts[1]
 		case TxtRecordKeyStatusCode:
 			if i, err := strconv.Atoi(parts[1]); err == nil {
 				d.StatusCode = i
@@ -112,8 +116,8 @@ func parseRecord(record string) (*TxtRecord, error) {
 		}
 	}
 
-	if d.Goto == "" {
-		return nil, errors.New("deviate txt records found but no goto value found")
+	if d.Goto == "" || d.Email == "" {
+		return nil, errors.New("deviate dns txt record found but missing goto or email value")
 	}
 
 	return &d, nil
