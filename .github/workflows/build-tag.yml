@@ -1,0 +1,19 @@
+name: Build on new tag
+
+on:
+  push:
+    tags:
+      - "v*"
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.15
+    - name: Get XCaddy
+      run: go get -u github.com/caddyserver/xcaddy/cmd/xcaddy
+    - name: Test
+      run: ~/go/bin/xcaddy build --with github.com/rlweb/deviate-dns --with github.com/abreka/caddy-tlsfirestore
