@@ -22,8 +22,7 @@ func init() {
 	caddy.RegisterModule(Middleware{})
 }
 
-// Middleware implements an HTTP handler that writes the
-// visitor's IP address to a file or stream.
+// Middleware implements an HTTP handler that grabs redirect data from a txt record
 type Middleware struct {
 	logger *zap.Logger
 }
@@ -43,10 +42,12 @@ func (g *Middleware) Provision(ctx caddy.Context) error {
 
 // ServeHTTP implements caddyhttp.MiddlewareHandler.
 func (m Middleware) ServeHTTP(w http.ResponseWriter, r *http.Request, next caddyhttp.Handler) error {
-	deviateRecord, err := getRecord(r.Host) // todo write to a log the dns err
+	deviateRecord, err := getRecord(r.Host)
+	w.Header().Set("Server", RedirectTitle)
 	if err != nil {
 		m.logger.Info(err.Error())
-		w.Header().Add("Deviate-Error", err.Error())
+		w.Write([]byte("The domain is pointing to Deviate DNS. Error:" + err.Error()))
+		return nil
 	}
 	if deviateRecord != nil {
 		var location = "https://" + deviateRecord.Goto
@@ -58,7 +59,6 @@ func (m Middleware) ServeHTTP(w http.ResponseWriter, r *http.Request, next caddy
 		w.Write([]byte("<center><h1>301 Moved Permanently</h1></center>\n<hr><center>" + RedirectTitle + "</center>"))
 		return nil
 	}
-	w.Header().Set("Server", RedirectTitle)
 	return next.ServeHTTP(w, r)
 }
 

@@ -3,35 +3,63 @@
     "tls": {
       "automation": {
         "on_demand": {
-          "rate_limit": {
-            "interval": "1m",
-            "burst": 10
-          }
         },
         "policies":[{
           "issuers": [{
             "module": "zerossl",
             "email": "{env.EMAIL}",
             "api_key": "{env.API_KEY}"
-          }]
+          }],
+          "on_demand": true
         }]
       }
     },
     "http": {
       "servers": {
-        "*": {
-          "listen": [":80", ":443"],
+        "catch_all_https": {
+          "logs": {
+            "default_logger_name": "default"
+          },
+          "listen": [":443"],
           "routes": [
             {
+              "match": [],
               "handle": [
-                {"handler": "deviate-dns"},
-                {
-                  "handler": "static_response",
-                  "body": "The domain is pointing to Deviate DNS, check headers if your here by mistake"
-                }
+                {"handler": "deviate-dns"}
               ]
             }
           ]
+        },
+        "catch_all_http": {
+          "logs": {
+            "default_logger_name": "default"
+          },
+          "listen": [":80"],
+          "routes": [
+            {
+              "match": [],
+              "handle": [
+                {"handler": "deviate-dns"}
+              ]
+            }
+          ]
+        }
+      }
+    }
+  },
+  "logging": {
+    "sink": {
+      "writer": {
+        "output": "stderr"
+      }
+    },
+    "logs": {
+      "default": {
+        "writer": {
+          "output": "stderr"
+        },
+        "encoder": {
+          "format": "json"
         }
       }
     }

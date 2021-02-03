@@ -1,0 +1,11 @@
+version: "3"
+
+services:
+  deviate-dns:
+    build: .
+    ports:
+      - "443:443"
+      - "80:80"
+    env_file: ./.env
+    volumes:
+      - "~/.config/gcloud/application_default_credentials.json:/application_default_credentials.json"
